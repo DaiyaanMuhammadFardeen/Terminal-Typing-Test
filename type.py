@@ -1,15 +1,44 @@
 import curses
 import random
 import time
+import urllib.request
+import os
+import sys
 
-# List of common words for the typing test
-words = [
-    "the", "of", "and", "a", "to", "in", "is", "you", "that", "it", "he", "was", "for", "on", "are", "as", "with", "his", "they", "I",
-    "at", "be", "this", "have", "from", "or", "one", "had", "by", "word", "but", "not", "what", "all", "were", "we", "when", "your", "can", "said",
-    "there", "use", "an", "each", "which", "she", "do", "how", "their", "if", "will", "up", "other", "about", "out", "many", "then", "them", "these", "so",
-    "some", "her", "would", "make", "like", "him", "into", "time", "has", "look", "two", "more", "write", "go", "see", "number", "no", "way", "could", "people",
-    "my", "than", "first", "water", "been", "call", "who", "oil", "its", "now", "find", "long", "down", "day", "did", "get", "come", "made", "may", "part"
-]
+# Function to fetch and save dictionary words
+def fetch_dictionary_words():
+    filename = "dictionary_words.txt"
+
+    # Check if file already exists
+    if os.path.exists(filename):
+        try:
+            with open(filename, 'r') as f:
+                words = [line.strip() for line in f if line.strip()]
+            return words
+        except Exception as e:
+            # Fallback to default list if file read fails
+            return [
+                    "the", "of", "and", "a", "to", "in", "is", "you", "that", "it",
+                    "he", "was", "for", "on", "are", "as", "with", "his", "they", "I"
+                    ]
+
+    # Fetch words only if file doesn't exist
+    print("Loading words...", file=sys.stderr)
+    try:
+        url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
+        with urllib.request.urlopen(url) as response:
+            words = response.read().decode('utf-8').splitlines()
+        # Save to file
+        with open(filename, 'w') as f:
+            for word in words:
+                f.write(word + '\n')
+        return words
+    except Exception as e:
+        # Fallback to default list if download fails
+        return [
+                "the", "of", "and", "a", "to", "in", "is", "you", "that", "it",
+                "he", "was", "for", "on", "are", "as", "with", "his", "they", "I"
+                ]
 
 def main(stdscr):
     # Initialize colors
@@ -21,6 +50,9 @@ def main(stdscr):
 
     stdscr.nodelay(False)
     stdscr.keypad(True)
+
+    # Fetch or load dictionary words
+    words = fetch_dictionary_words()
 
     while True:
         stdscr.clear()
@@ -34,7 +66,9 @@ def main(stdscr):
         sentence_list = random.choices(words, k=20)
         sentence = ' '.join(sentence_list)
         max_y, max_x = stdscr.getmaxyx()
-        # Wrap sentence if too long, but for simplicity assume terminal is wide enough
+        # Wrap sentence if too long
+        if len(sentence) > max_x - 1:
+            sentence = sentence[:max_x-1]
 
         stdscr.addstr(4, 0, "Text to type:")
         stdscr.addstr(5, 0, sentence)
