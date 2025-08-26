@@ -3,10 +3,6 @@
 Welcome to **Terminal-Typing-Test**, my **hello world** dive into the wild world of **generative AI**! 🚀 Ditch the browser—this terminal-based typing test challenges you to type quirky, AI-generated Mark Twain-inspired quotes as fast as your fingers can fly. Think typing practice meets Twain’s wit with a dash of *AI slop* for flavor. Oh, and there’s a **secret Easter egg** hidden in the codebase—can you find it? 👀
 
 ![Terminal Typing Test](https://img.shields.io/badge/Terminal-Typing%20Test-blueviolet?style=flat-square&logo=github)  
-**Stars**: ⭐ {repo_stars} | **Forks**: 🍴 {repo_forks} | **Topics**: {repo_topics}
-
-*Last updated: {last_commit_date}*  
-*Latest commit: {last_commit_message}*
 
 ---
 
@@ -81,17 +77,3 @@ This project is my first adventure in generative AI, using a **character-level R
    - Watch for **green** (correct) and **red** (incorrect) characters.
 
 ---
-
-## 🛠️ Dynamic GitHub Stats
-
-This README pulls live data from the GitHub API to keep things fresh:
-
-- **Stars**: ⭐ {repo_stars} (e.g., 42)
-- **Forks**: 🍴 {repo_forks} (e.g., 10)
-- **Topics**: {repo_topics} (e.g., `generative-ai`, `typing-test`, `mark-twain`)
-- **Latest Commit**: {last_commit_message} (e.g., "Add text wrapping to type.py") on {last_commit_date} (e.g., Aug 26, 2025)
-
-**Manual Update**:
-Fetch data using the GitHub API:
-```bash
-curl -
