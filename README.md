@@ -1,4 +1,4 @@
-# 🌟 Terminal Typing Test: Twain’s AI Slop Typing Extravaganza! 🌟
+# 🌟 Terminal Typing Test: Try out Mark Twain Styled AI slop for your typing practice! 🌟
 
 Welcome to **Terminal-Typing-Test**, my **hello world** dive into the wild world of **generative AI**! 🚀 Ditch the browser—this terminal-based typing test challenges you to type quirky, AI-generated Mark Twain-inspired quotes as fast as your fingers can fly. Think typing practice meets Twain’s wit with a dash of *AI slop* for flavor. Oh, and there’s a **secret Easter egg** hidden in the codebase—can you find it? 👀
 
