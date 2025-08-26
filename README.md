@@ -19,10 +19,8 @@ This project is my first adventure in generative AI, using a **character-level R
 
 - **AI-Generated Twain Quotes**: A `CharRNN` model (256 embedding size, 512 hidden units, 3 LSTM layers) generates sentences inspired by Mark Twain’s style. Expect witty dialogue, Southern charm, or gloriously weird “AI slop.”
 - **Terminal Typing Test**: Type the generated text in a colorful ncurses interface. Correct characters glow **green**, mistakes burn **red**, and stats (WPM, accuracy) pop in **yellow**.
-- **Text Wrapping**: Long sentences wrap across multiple lines to fit your terminal, keeping every Twain-inspired word intact.
 - **Efficient Data Handling**: Preprocessed data (`chars`, `stoi`, `itos`, `data`, `vocab_size`) is saved to `mark_twain_preprocessed.pkl` for quick loading.
-- **Dynamic GitHub Stats**: Live repo stats (stars, forks, topics) fetched via GitHub API, showing the project’s pulse.
-- **Easter Egg Alert**: An unused file lurks in `TextGens/shakespeare_quotes.pt`. A hint of future bardic adventures? 🤔
+- **Easter Egg Alert**: An unused file lurks in `TextGens/shakespeare_quotes.pt`. Doth a sly whisper of bardic exploits to come mock us with its secrecy? 🤔
 
 ---
 
@@ -47,7 +45,7 @@ This project is my first adventure in generative AI, using a **character-level R
 
 1. **Clone the Repo**:
    ```bash
-   git clone https://github.com/{owner}/{repo}.git
+   git clone https://github.com/DaiyaanMuhammadFardeen/Terminal-Typing-Test.git
    cd Terminal-Typing-Test
    ```
 
