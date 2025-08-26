@@ -55,17 +55,7 @@ This project is my first adventure in generative AI, using a **character-level R
    ```
    *(Note: `curses` is included in Python’s standard library on Unix-like systems. For Windows, install `windows-curses`.)*
 
-3. **Preprocess Data**:
-   ```bash
-   python cleanup.py
-   ```
-
-4. **Train the Model** (if not using the provided checkpoint):
-   ```bash
-   python train.py
-   ```
-
-5. **Run the Typing Test**:
+3. **Run the Typing Test**:
    ```bash
    python type.py
    ```
