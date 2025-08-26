@@ -1,44 +1,13 @@
 import curses
-import random
+from generate import TextGenerator
 import time
-import urllib.request
-import os
-import sys
 
-# Function to fetch and save dictionary words
-def fetch_dictionary_words():
-    filename = "dictionary_words.txt"
-
-    # Check if file already exists
-    if os.path.exists(filename):
-        try:
-            with open(filename, 'r') as f:
-                words = [line.strip() for line in f if line.strip()]
-            return words
-        except Exception as e:
-            # Fallback to default list if file read fails
-            return [
-                    "the", "of", "and", "a", "to", "in", "is", "you", "that", "it",
-                    "he", "was", "for", "on", "are", "as", "with", "his", "they", "I"
-                    ]
-
-    # Fetch words only if file doesn't exist
-    print("Loading words...", file=sys.stderr)
-    try:
-        url = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
-        with urllib.request.urlopen(url) as response:
-            words = response.read().decode('utf-8').splitlines()
-        # Save to file
-        with open(filename, 'w') as f:
-            for word in words:
-                f.write(word + '\n')
-        return words
-    except Exception as e:
-        # Fallback to default list if download fails
-        return [
-                "the", "of", "and", "a", "to", "in", "is", "you", "that", "it",
-                "he", "was", "for", "on", "are", "as", "with", "his", "they", "I"
-                ]
+def wrap_text(sentence, max_x):
+    """Split sentence into lines of max_x - 1 characters."""
+    lines = []
+    for i in range(0, len(sentence), max_x - 1):
+        lines.append(sentence[i:i + max_x - 1])
+    return lines
 
 def main(stdscr):
     # Initialize colors
@@ -51,8 +20,8 @@ def main(stdscr):
     stdscr.nodelay(False)
     stdscr.keypad(True)
 
-    # Fetch or load dictionary words
-    words = fetch_dictionary_words()
+    # Initialize text generator
+    generator = TextGenerator()
 
     while True:
         stdscr.clear()
@@ -62,18 +31,28 @@ def main(stdscr):
         stdscr.addstr(1, 0, "Type the text below as fast and accurately as possible.")
         stdscr.addstr(2, 0, "Press ESC to quit at any time.")
 
-        # Generate random sentence (20 words)
-        sentence_list = random.choices(words, k=20)
-        sentence = ' '.join(sentence_list)
+        # Generate sentence using TextGenerator
+        sentence = generator.generate(start="The", sentences=5, temp=1.0, max_length=1000)
         max_y, max_x = stdscr.getmaxyx()
-        # Wrap sentence if too long
-        if len(sentence) > max_x - 1:
-            sentence = sentence[:max_x-1]
 
+        # Wrap sentence into lines
+        lines = wrap_text(sentence, max_x)
+        start_row = 5
+
+        # Check if terminal has enough rows
+        if start_row + len(lines) + 4 > max_y:
+            stdscr.addstr(4, 0, "Error: Terminal too small to display full text.", curses.color_pair(2))
+            stdscr.addstr(6, 0, "Press any key to quit.")
+            stdscr.refresh()
+            stdscr.getch()
+            return
+
+        # Display wrapped sentence
         stdscr.addstr(4, 0, "Text to type:")
-        stdscr.addstr(5, 0, sentence)
-        stdscr.addstr(7, 0, "Start typing here (backspace enabled):")
+        for i, line in enumerate(lines):
+            stdscr.addstr(start_row + i, 0, line)
 
+        stdscr.addstr(start_row + len(lines) + 1, 0, "Start typing here (backspace enabled):")
         stdscr.refresh()
 
         typed = ""
@@ -97,20 +76,28 @@ def main(stdscr):
                 typed += chr(ch)
                 pos += 1
 
-            # Redraw the sentence with colors
-            stdscr.move(5, 0)
-            stdscr.clrtoeol()
-            for i, char in enumerate(sentence):
-                attr = 0
-                if i < len(typed):
-                    if typed[i] == char:
-                        attr = curses.color_pair(1)  # Green for correct
-                    else:
-                        attr = curses.color_pair(2)  # Red for incorrect
-                stdscr.addch(char, attr)
+            # Determine cursor position (row, col)
+            cursor_row = start_row + (pos // (max_x - 1))
+            cursor_col = pos % (max_x - 1)
 
-            # Show cursor position
-            stdscr.move(5, min(pos, max_x - 1))
+            # Redraw only the current line
+            line_idx = pos // (max_x - 1)
+            if line_idx < len(lines):  # Ensure line exists
+                stdscr.move(start_row + line_idx, 0)
+                stdscr.clrtoeol()
+                line_start = line_idx * (max_x - 1)
+                for i, char in enumerate(lines[line_idx]):
+                    attr = 0
+                    global_idx = line_start + i
+                    if global_idx < len(typed):
+                        if typed[global_idx] == char:
+                            attr = curses.color_pair(1)  # Green for correct
+                        else:
+                            attr = curses.color_pair(2)  # Red for incorrect
+                    stdscr.addch(char, attr)
+
+            # Update cursor position
+            stdscr.move(cursor_row, cursor_col)
             stdscr.refresh()
 
         end_time = time.time()
@@ -122,11 +109,12 @@ def main(stdscr):
         wpm = (len(sentence) / 5) / (time_taken / 60) if time_taken > 0 else 0
 
         # Display stats
-        stdscr.addstr(9, 0, "Test Complete!", curses.color_pair(4) | curses.A_BOLD)
-        stdscr.addstr(10, 0, f"Time taken: {time_taken:.2f} seconds")
-        stdscr.addstr(11, 0, f"Words per minute (WPM): {wpm:.2f}")
-        stdscr.addstr(12, 0, f"Accuracy: {accuracy:.2f}%")
-        stdscr.addstr(14, 0, "Press 'y' to try again, or any other key to quit.")
+        stats_row = start_row + len(lines) + 3
+        stdscr.addstr(stats_row, 0, "Test Complete!", curses.color_pair(4) | curses.A_BOLD)
+        stdscr.addstr(stats_row + 1, 0, f"Time taken: {time_taken:.2f} seconds")
+        stdscr.addstr(stats_row + 2, 0, f"Words per minute (WPM): {wpm:.2f}")
+        stdscr.addstr(stats_row + 3, 0, f"Accuracy: {accuracy:.2f}%")
+        stdscr.addstr(stats_row + 5, 0, "Press 'y' to try again, or any other key to quit.")
 
         stdscr.refresh()
 
